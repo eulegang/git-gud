@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "detect.h"
+#include "util.h"
 
 int main(int argc, char **argv) {
-  puts("Hello, git_gud!");
-
   cmd_t cmd = detect_cmd(argc, argv);
 
   switch (cmd) {
@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     puts("POST-CHECKOUT");
     break;
   case CMD_INVALID:
-    puts("Invalid command given");
+    die("failed to detect the type of script this is supposed to run\n");
     break;
   }
 
