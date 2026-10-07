@@ -12,6 +12,7 @@ set(CMAKE_C_EXTENSIONS ON)
 
 add_executable(git-gud
     src/main.c
+		src/detect.c
 )
 
 enable_testing()
