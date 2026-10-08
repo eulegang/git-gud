@@ -6,6 +6,7 @@
 
 #include <git2.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -21,15 +22,19 @@ int git_gud_version(void) {
     die("failed to open git repo: %s\n", err->message);
   }
 
-  const char *path = git_repository_commondir(repo);
-  char exec_path[PATH_MAX];
-  strncpy(exec_path, path, PATH_MAX);
-  strncat(exec_path, "hooks/git-gud", PATH_MAX);
+  char *no_hook = getenv("GIT_GUD_NO_HOOK_VERSION");
 
-  if (!access(exec_path, X_OK)) {
-    printf("hook: todo\n");
-  } else {
-    printf("hook: -\n");
+  if (!no_hook) {
+    const char *path = git_repository_commondir(repo);
+    char exec_path[PATH_MAX];
+    strncpy(exec_path, path, PATH_MAX);
+    strncat(exec_path, "hooks/git-gud", PATH_MAX);
+
+    if (!access(exec_path, X_OK)) {
+      printf("hook: todo\n");
+    } else {
+      printf("hook: -\n");
+    }
   }
 
   git_repository_free(repo);
