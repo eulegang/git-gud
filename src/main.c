@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "detect.h"
+#include "gitgud.h"
 #include "util.h"
 
 int main(int argc, char **argv) {
@@ -9,7 +11,7 @@ int main(int argc, char **argv) {
 
   switch (cmd) {
   case CMD_GIT_GUD:
-    puts("GIT-GUD");
+    return git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
     puts("POST-CHECKOUT");
