@@ -7,7 +7,7 @@
 #define die(fmt, ...)                                                          \
   do {                                                                         \
     fprintf(stderr, fmt __VA_OPT__(, ) __VA_ARGS__);                           \
-    exit(0);                                                                   \
+    exit(1);                                                                   \
   } while (0)
 
 #endif
