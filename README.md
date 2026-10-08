@@ -17,6 +17,10 @@ cmake --build build
 
 ## Test
 
+Tests are written with [Bats](https://bats-core.readthedocs.io/) and registered with CTest when `bats` is available on `PATH`.
+
 ```sh
-ctest --test-dir build
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
 ```

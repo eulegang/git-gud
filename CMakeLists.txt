@@ -36,4 +36,28 @@ target_include_directories(git-gud PRIVATE
 target_link_libraries(git-gud PRIVATE ${GIT2_LDFLAGS})
 target_compile_options(git-gud PRIVATE ${GIT2_CFLAGS})
 
-enable_testing()
+include(CTest)
+
+if(BUILD_TESTING)
+    find_program(BATS_EXECUTABLE NAMES bats bats-core)
+
+    if(BATS_EXECUTABLE)
+        file(GLOB BATS_TEST_FILES CONFIGURE_DEPENDS
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.bats
+        )
+
+        foreach(BATS_TEST_FILE IN LISTS BATS_TEST_FILES)
+            get_filename_component(BATS_TEST_NAME ${BATS_TEST_FILE} NAME_WE)
+            add_test(
+                NAME bats.${BATS_TEST_NAME}
+                COMMAND ${BATS_EXECUTABLE} ${BATS_TEST_FILE}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+            set_tests_properties(bats.${BATS_TEST_NAME} PROPERTIES
+                ENVIRONMENT "GIT_GUD_BINARY=$<TARGET_FILE:git-gud>"
+            )
+        endforeach()
+    else()
+        message(STATUS "bats not found; skipping bats tests")
+    endif()
+endif()
