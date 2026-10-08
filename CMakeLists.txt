@@ -26,6 +26,7 @@ add_executable(git-gud
     src/detect.c
 		src/gitgud.c
 		src/gversion.c
+		src/ginstall.c
 )
 
 target_include_directories(git-gud PRIVATE

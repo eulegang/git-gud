@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
-int git_gud_version() {
+int git_gud_version(void) {
   printf("cmd: %s\n", GIT_GUD_VERSION);
   git_repository *repo;
 
