@@ -1,9 +1,14 @@
 #include "gitgud.h"
 #include "util.h"
-#include "version.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <git2.h>
+
+#include "gversion.h"
 
 typedef enum {
   GUD_CMD_VERSION,
@@ -26,12 +31,15 @@ static gud_cmd_t detect_gud_cmd(int argc, char **argv) {
 }
 
 int git_gud_main(int argc, char **argv) {
+  git_libgit2_init();
 
   gud_cmd_t cmd = detect_gud_cmd(argc, argv);
+  getcwd(CWD, PATH_MAX);
+  int status = 0;
 
   switch (cmd) {
   case GUD_CMD_VERSION:
-    printf("%s\n", GIT_GUD_VERSION);
+    status = git_gud_version();
     break;
 
   case GUD_CMD_INVALID:
@@ -43,5 +51,7 @@ int git_gud_main(int argc, char **argv) {
     break;
   }
 
-  return 0;
+  git_libgit2_shutdown();
+
+  return status;
 }
