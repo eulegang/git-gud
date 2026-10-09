@@ -7,11 +7,28 @@
 #include "util.h"
 
 int main(int argc, char **argv) {
+  const char *tracefile = getenv("GIT_GUD_TRACE_FILE");
+  if (tracefile) {
+    if (tracefile[0] == 0) {
+      init_trace_log(NULL);
+    } else {
+      init_trace_log(tracefile);
+    }
+  }
+
+  when_tracing {
+    trace("starting git-gud\n");
+    for (int i = 0; i < argc; i++) {
+      trace("  - %s\n", argv[0]);
+    }
+  }
+
   cmd_t cmd = detect_cmd(argc, argv);
+  int status = 0;
 
   switch (cmd) {
   case CMD_GIT_GUD:
-    return git_gud_main(argc, argv);
+    status = git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
     puts("POST-CHECKOUT");
@@ -21,5 +38,7 @@ int main(int argc, char **argv) {
     break;
   }
 
-  return 0;
+  deinit_trace_log();
+
+  return status;
 }

@@ -24,6 +24,7 @@ configure_file(
 add_executable(git-gud
     src/main.c
     src/detect.c
+		src/util.c
 		src/gitgud.c
 		src/gversion.c
 		src/ginstall.c
