@@ -28,6 +28,7 @@ add_executable(git-gud
 		src/gitgud.c
 		src/gversion.c
 		src/ginstall.c
+		src/hooks/post-checkout.c
 )
 
 target_include_directories(git-gud PRIVATE

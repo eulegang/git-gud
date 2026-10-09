@@ -3,46 +3,56 @@
 #include "util.h"
 
 #include <fcntl.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <git2.h>
 #include <sys/fcntl.h>
+#include <sys/syslimits.h>
 #include <unistd.h>
 
-static int install_base(char *src, char *dst) {
-  int fin = open(src, O_RDONLY);
-  int fout = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0755);
+static int link_script(const char *src, const char *name, install_opts opts) {
+  char buf[PATH_MAX];
 
-  char buf[4096];
-  int written = 0;
+  char *path = dirname_r(src, buf);
 
-  while (true) {
-    ssize_t len = read(fin, buf, 4096);
-    ssize_t off = 0;
+  strncat(path, "/", PATH_MAX);
+  strncat(path, name, PATH_MAX);
 
-    if (len == -1) {
-      return -1;
-    }
+  int status = symlink(src, path);
 
-    if (len == 0) {
-      break;
-    }
+  if (status == -1 && opts.force) {
+    unlink(path);
 
-    while (off < len) {
-      ssize_t w = write(fout, buf + off, (size_t)(len - off));
-
-      if (w == -1) {
-        return -1;
-      }
-
-      off += w;
-      written += w;
-    }
+    return symlink(src, path);
   }
 
-  return written;
+  return status;
 }
+
+static int install_base(char *src, char *dst, install_opts opts) {
+  int status = link(src, dst);
+
+  if (status == -1 && opts.force) {
+    unlink(dst);
+
+    return link(src, dst);
+  }
+
+  return status;
+}
+
+enum FailedStage {
+  FailedPostCheckout = 1,
+  FailedEnd,
+};
+
+char *stages[] = {
+    NULL,
+    "post-checkout",
+    NULL,
+};
 
 int git_gud_install(install_opts opts) {
   git_repository *repo;
@@ -62,9 +72,28 @@ int git_gud_install(install_opts opts) {
   if (!access(exec_path, X_OK) && !opts.force) {
     die("refusing to install over existing version (use --force to ignore)\n");
   } else {
-    status = install_base(opts.src, exec_path);
+    int failed_statuses = 0;
+    status = install_base(opts.src, exec_path, opts);
     if (status == -1) {
       die("failed to install git-gud\n");
+    }
+
+    for (int i = 1; i < FailedEnd; i++) {
+      status = link_script(exec_path, stages[i], opts);
+      if (status == -1) {
+        failed_statuses |= 1 << i;
+      }
+    }
+
+    if (failed_statuses) {
+      warn("failed to install the following scripts\n");
+      for (int i = 1; i < FailedEnd; i++) {
+        if ((failed_statuses & (1 << i)) != 0) {
+          warn("  - %s\n", stages[i]);
+        }
+      }
+
+      die("");
     }
   }
 

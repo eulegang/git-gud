@@ -4,6 +4,7 @@
 
 #include "detect.h"
 #include "gitgud.h"
+#include "hooks/post-checkout.h"
 #include "util.h"
 
 int main(int argc, char **argv) {
@@ -31,7 +32,7 @@ int main(int argc, char **argv) {
     status = git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
-    puts("POST-CHECKOUT");
+    return hook_post_checkout(argc, argv);
     break;
   case CMD_INVALID:
     die("failed to detect the type of script this is supposed to run\n");
