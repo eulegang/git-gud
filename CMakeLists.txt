@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GIT2 libgit2)
+pkg_check_modules(LUA lua)
 
 configure_file(
     src/version.h.in
@@ -28,7 +29,10 @@ add_executable(git-gud
 		src/gitgud.c
 		src/gversion.c
 		src/ginstall.c
+
 		src/hooks/post-checkout.c
+
+		src/config/config.c
 )
 
 target_include_directories(git-gud PRIVATE
@@ -37,6 +41,8 @@ target_include_directories(git-gud PRIVATE
 
 target_link_libraries(git-gud PRIVATE ${GIT2_LDFLAGS})
 target_compile_options(git-gud PRIVATE ${GIT2_CFLAGS})
+target_link_libraries(git-gud PRIVATE ${LUA_LDFLAGS})
+target_compile_options(git-gud PRIVATE ${LUA_CFLAGS})
 
 include(CTest)
 
