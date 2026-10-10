@@ -1,0 +1,23 @@
+#ifndef _CONFIG_INTERNAL_H
+#define _CONFIG_INTERNAL_H
+
+#include <git2.h>
+#include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+
+#define REFS_MAX 64
+
+struct lua_refs {
+  int n;
+  int refs[REFS_MAX];
+};
+
+struct config {
+  lua_State *state;
+  git_repository *repo;
+
+  struct lua_refs on_checkout;
+};
+
+#endif

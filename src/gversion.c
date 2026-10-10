@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
+static char EXEC_PATH[PATH_MAX];
 int git_gud_version(void) {
   char *hook = getenv("GIT_GUD_HOOK_VERSION");
 
@@ -30,17 +31,16 @@ int git_gud_version(void) {
 
   if (!hook) {
     const char *path = git_repository_commondir(repo);
-    char exec_path[PATH_MAX];
-    strncpy(exec_path, path, PATH_MAX);
-    strncat(exec_path, "hooks/git-gud", PATH_MAX);
+    strncpy(EXEC_PATH, path, PATH_MAX);
+    strncat(EXEC_PATH, "hooks/git-gud", PATH_MAX);
 
-    if (!access(exec_path, X_OK)) {
+    if (!access(EXEC_PATH, X_OK)) {
       char *env[] = {
           "GIT_GUD_HOOK_VERSION=1",
           0,
       };
 
-      execle(exec_path, exec_path, "version", 0, env);
+      execle(EXEC_PATH, EXEC_PATH, "version", 0, env);
       die("failed to exec the hooked version\n");
     } else {
       printf("hook: -\n");

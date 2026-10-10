@@ -24,9 +24,18 @@ extern FILE *stdtrace;
     exit(1);                                                                   \
   } while (0)
 
+#define todo(fmt, ...)                                                         \
+  do {                                                                         \
+    fprintf(stderr, "[%s:%d] TODO: " fmt, __FILE__,                            \
+            __LINE__ __VA_OPT__(, ) __VA_ARGS__);                              \
+    abort();                                                                   \
+  } while (0)
+
 #define when_tracing if (stdtrace)
 
 void init_trace_log(const char *path);
 void deinit_trace_log();
+
+const char *config_path();
 
 #endif

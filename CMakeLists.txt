@@ -33,6 +33,7 @@ add_executable(git-gud
 		src/hooks/post-checkout.c
 
 		src/config/config.c
+		src/config/on_post_checkout.c
 )
 
 target_include_directories(git-gud PRIVATE

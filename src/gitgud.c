@@ -12,6 +12,8 @@
 #include "ginstall.h"
 #include "gversion.h"
 
+char CWD[PATH_MAX];
+
 typedef enum {
   GUD_CMD_VERSION,
   GUD_CMD_INSTALL,
