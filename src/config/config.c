@@ -1,6 +1,5 @@
 
 #include "config.h"
-#include "git2/deprecated.h"
 #include "git2/repository.h"
 #include "git2/strarray.h"
 #include "git2/types.h"
