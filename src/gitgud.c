@@ -48,7 +48,6 @@ int git_gud_main(int argc, char **argv) {
   int ch;
 
   gud_cmd_t cmd = detect_gud_cmd(argc, argv);
-  getcwd(CWD, PATH_MAX);
   int status = 0;
 
   switch (cmd) {

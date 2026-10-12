@@ -16,6 +16,7 @@ struct lua_refs {
 struct config {
   lua_State *state;
   git_repository *repo;
+  git_repository *parent;
 
   struct lua_refs on_checkout;
 };

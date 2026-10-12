@@ -1,7 +1,9 @@
 
 #include "config.h"
+#include "git2/deprecated.h"
 #include "git2/repository.h"
 #include "git2/strarray.h"
+#include "git2/types.h"
 #include "git2/worktree.h"
 #include "internal.h"
 
@@ -12,6 +14,7 @@
 #include <string.h>
 
 static int gud_on_checkout(lua_State *state) {
+  trace("gud_on_checkout called\n");
   luaL_checktype(state, 1, LUA_TFUNCTION);
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
@@ -23,6 +26,7 @@ static int gud_on_checkout(lua_State *state) {
   int new_ref = luaL_ref(state, LUA_REGISTRYINDEX);
 
   config->on_checkout.refs[config->on_checkout.n++] = new_ref;
+  trace("ref added\n");
 
   return 0;
 }
@@ -40,7 +44,8 @@ static const luaL_Reg gud_funcs[] = {{"on_checkout", gud_on_checkout},
 
                                      {NULL, NULL}};
 
-config_t *config_init(const char *path, git_repository *repo) {
+config_t *config_init(const char *path, git_repository *repo,
+                      git_repository *parent) {
   config_t *config = malloc(sizeof(config_t));
   if (!config) {
     return NULL;
@@ -52,6 +57,7 @@ config_t *config_init(const char *path, git_repository *repo) {
   }
 
   config->repo = repo;
+  config->parent = parent;
 
   config->on_checkout.n = 0;
   for (int i = 0; i < REFS_MAX; i++) {
@@ -66,8 +72,13 @@ config_t *config_init(const char *path, git_repository *repo) {
   lua_newtable(config->state);
   lua_pushlightuserdata(config->state, config);
   luaL_setfuncs(config->state, gud_funcs, 1);
+  lua_setglobal(config->state, "gud");
 
   if (luaL_dofile(config->state, path) != LUA_OK) {
+    const char *msg = lua_tostring(config->state, -1);
+
+    trace("failed to execute config [%s]: %s\n", path, msg);
+
     goto failed_eval;
   };
 
@@ -127,6 +138,8 @@ const char *config_root(config_t *config) {
         break;
       }
     }
+
+    git_strarray_free(&paths);
   }
 
   return REPO_ROOT;

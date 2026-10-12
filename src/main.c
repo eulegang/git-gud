@@ -20,18 +20,22 @@ int main(int argc, char **argv) {
   when_tracing {
     trace("starting git-gud\n");
     for (int i = 0; i < argc; i++) {
-      trace("  - %s\n", argv[0]);
+      trace("  - %s\n", argv[i]);
     }
   }
 
   cmd_t cmd = detect_cmd(argc, argv);
   int status = 0;
 
+  getcwd(CWD, PATH_MAX);
+
   switch (cmd) {
   case CMD_GIT_GUD:
+    trace("using git gud driver\n");
     status = git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
+    trace("using checkout driver\n");
     return hook_post_checkout(argc, argv);
     break;
   case CMD_INVALID:
