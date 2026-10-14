@@ -1,9 +1,6 @@
 
 #include "config.h"
-#include "git2/repository.h"
-#include "git2/strarray.h"
 #include "git2/types.h"
-#include "git2/worktree.h"
 #include "internal.h"
 
 #include "../util.h"
@@ -99,47 +96,11 @@ void config_deinit(config_t *config) {
     }
 
     lua_close(config->state);
+
+    git_repository_free(config->parent);
+
+    git_repository_free(config->repo);
   }
 
   free(config);
-}
-
-static bool str_startswith(const char *restrict prefix,
-                           const char *restrict content, int n) {
-
-  if (!prefix || !content)
-    return false;
-
-  for (int i = 0; i < n; i++) {
-    if (prefix[i] == 0)
-      return true;
-    if (prefix[i] != content[i])
-      return false;
-  }
-
-  return false;
-}
-
-static char REPO_ROOT[PATH_MAX] = {0};
-
-const char *config_root(config_t *config) {
-  if (REPO_ROOT[0] == 0) {
-    git_strarray paths;
-    git_worktree_list(&paths, config->repo);
-
-    auto common = git_repository_commondir(config->repo);
-
-    for (size_t i = 0; i < paths.count; i++) {
-      auto path = paths.strings[i];
-
-      if (str_startswith(path, common, PATH_MAX)) {
-        strncpy(REPO_ROOT, path, PATH_MAX);
-        break;
-      }
-    }
-
-    git_strarray_free(&paths);
-  }
-
-  return REPO_ROOT;
 }

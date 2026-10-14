@@ -31,11 +31,11 @@ int git_gud_version(void) {
 
   if (!hook) {
     const char *path = git_repository_commondir(repo);
-    if (strlcat(EXEC_PATH, path, PATH_MAX)) {
+    if (strlcpy(EXEC_PATH, path, PATH_MAX) >= PATH_MAX) {
       die("failed to exec the hooked version\n");
     }
 
-    if (strlcat(EXEC_PATH, "hooks/git-gud", PATH_MAX)) {
+    if (strlcat(EXEC_PATH, "hooks/git-gud", PATH_MAX) >= PATH_MAX) {
       die("failed to exec the hooked version\n");
     }
 

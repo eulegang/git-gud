@@ -43,10 +43,6 @@ int hook_post_checkout(int argc, char **argv) {
 
   config_post_checkout(config, data);
 
-  git_repository_free(parent);
-
-  git_repository_free(repo);
-
   config_deinit(config);
 
   git_libgit2_shutdown();

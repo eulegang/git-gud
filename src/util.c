@@ -26,7 +26,9 @@ const char *config_path() {
     const char *init = getenv("GIT_GUD_INIT");
 
     if (init) {
-      strncpy(CONFIG_PATH, init, PATH_MAX);
+      if (strlcpy(CONFIG_PATH, init, PATH_MAX) >= PATH_MAX) {
+        return NULL;
+      }
     } else {
       const char *home = getenv("HOME");
       if (!home) {
@@ -37,9 +39,14 @@ const char *config_path() {
       snprintf(candidate, PATH_MAX, "%s/.config/git/gud.lua", home);
 
       if (access(candidate, F_OK) == 0) {
-        strncpy(CONFIG_PATH, candidate, PATH_MAX);
+        if (strlcpy(CONFIG_PATH, candidate, PATH_MAX) >= PATH_MAX) {
+          return NULL;
+        }
       } else {
-        snprintf(CONFIG_PATH, PATH_MAX, "%s/.config/git-gud/init.lua", home);
+        if (snprintf(CONFIG_PATH, PATH_MAX, "%s/.config/git-gud/init.lua",
+                     home) >= PATH_MAX) {
+          return NULL;
+        }
       }
     }
   }

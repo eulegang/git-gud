@@ -24,7 +24,8 @@ static int post_checkout_event_exists(lua_State *state) {
 
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
-  if (strlcpy(PATH_SCRATCH, git_repository_workdir(config->repo), PATH_MAX)) {
+  if (strlcpy(PATH_SCRATCH, git_repository_workdir(config->repo), PATH_MAX) >=
+      PATH_MAX) {
     return luaL_error(state, "overflown path buffer");
   }
 

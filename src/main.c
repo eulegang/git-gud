@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     break;
   case CMD_POST_CHECKOUT:
     trace("using checkout driver\n");
-    return hook_post_checkout(argc, argv);
+    status = hook_post_checkout(argc, argv);
     break;
   case CMD_INVALID:
     die("failed to detect the type of script this is supposed to run\n");
