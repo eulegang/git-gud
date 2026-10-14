@@ -17,6 +17,8 @@ installs and runs git lua hooks for repository automation.
 The installed hooks load a Lua configuration file and run registered handlers for
 Git events.
 By default the configuration is read from
+.Pa ~/.config/git/gud.lua
+when it exists, otherwise
 .Pa ~/.config/git-gud/init.lua .
 Set
 .Ev GIT_GUD_INIT
@@ -46,6 +48,8 @@ Runs after a checkout and invokes registered Lua checkout handlers.
 .Bl -tag -width GIT_GUD_TRACE_FILE
 .It Ev GIT_GUD_INIT
 Path to the Lua configuration file. Defaults to
+.Pa ~/.config/git/gud.lua
+when it exists, otherwise
 .Pa ~/.config/git-gud/init.lua .
 .It Ev GIT_GUD_TRACE_FILE
 Enable tracing. If set to an empty value, trace output is written to standard

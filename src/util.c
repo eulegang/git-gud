@@ -33,8 +33,14 @@ const char *config_path() {
         die("Can not resolve default config file");
       }
 
-      strncpy(CONFIG_PATH, home, PATH_MAX);
-      strncat(CONFIG_PATH, "/.config/git-gud/init.lua", PATH_MAX);
+      char candidate[PATH_MAX] = {0};
+      snprintf(candidate, PATH_MAX, "%s/.config/git/gud.lua", home);
+
+      if (access(candidate, F_OK) == 0) {
+        strncpy(CONFIG_PATH, candidate, PATH_MAX);
+      } else {
+        snprintf(CONFIG_PATH, PATH_MAX, "%s/.config/git-gud/init.lua", home);
+      }
     }
   }
 

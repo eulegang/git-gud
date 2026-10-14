@@ -3,7 +3,7 @@
 ---Lua API exposed to git-gud configuration files.
 ---
 ---The `gud` table is available as a global in the file loaded from
----`~/.config/git-gud/init.lua` or `GIT_GUD_INIT`.
+---`~/.config/git/gud.lua`, `~/.config/git-gud/init.lua`, or `GIT_GUD_INIT`.
 ---@class GitGud
 ---@field on_checkout fun(handler: fun(checkout: GitGud.CheckoutEvent)) Register a handler for Git's post-checkout hook.
 
