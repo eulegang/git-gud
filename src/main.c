@@ -27,7 +27,11 @@ int main(int argc, char **argv) {
   cmd_t cmd = detect_cmd(argc, argv);
   int status = 0;
 
-  getcwd(CWD, PATH_MAX);
+  const char *cwd = getcwd(CWD, PATH_MAX);
+  if (!cwd) {
+    perror("failed to find current working directory");
+    return 1;
+  }
 
   switch (cmd) {
   case CMD_GIT_GUD:
