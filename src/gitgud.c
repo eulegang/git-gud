@@ -57,7 +57,8 @@ int git_gud_main(int argc, char **argv) {
 
   case GUD_CMD_INSTALL:
     install_opts opts = {.force = false, .src = argv[0]};
-    while ((ch = getopt_long(argc, argv, "f", install_options, NULL)) != -1) {
+    while ((ch = getopt_long(argc - 1, argv + 1, "f", install_options, NULL)) !=
+           -1) {
       switch (ch) {
       case 'f':
         opts.force = true;
