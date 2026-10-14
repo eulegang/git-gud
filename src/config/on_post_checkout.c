@@ -120,7 +120,7 @@ static int post_checkout_event_changes(lua_State *state) {
   }
 
   git_commit_lookup(&commit_old, config->repo, &oid_old);
-  git_commit_lookup(&commit_new, config->repo, &oid_old);
+  git_commit_lookup(&commit_new, config->repo, &oid_new);
 
   if (git_commit_tree(&tree_old, commit_old) != 0) {
     return luaL_error(state, "failed to resolve commit content %s",
