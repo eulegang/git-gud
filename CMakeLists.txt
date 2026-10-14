@@ -45,6 +45,10 @@ target_compile_options(git-gud PRIVATE ${GIT2_CFLAGS})
 target_link_libraries(git-gud PRIVATE ${LUA_LDFLAGS})
 target_compile_options(git-gud PRIVATE ${LUA_CFLAGS})
 
+include(GNUInstallDirs)
+install(TARGETS git-gud RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES man/git-gud.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+
 include(CTest)
 
 if(BUILD_TESTING)
