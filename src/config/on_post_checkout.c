@@ -110,7 +110,8 @@ static int post_checkout_event_changes(lua_State *state) {
   git_commit *commit_old = NULL, *commit_new = NULL;
   git_tree *tree_old = NULL, *tree_new = NULL;
   git_diff *diff = NULL;
-  int ret = 0;
+  const char *err;
+  const char *commit;
 
   if (git_oid_fromstr(&oid_old, checkout->prev) != 0) {
     return luaL_error(state, "failed to convert git hash to oid: %s",
@@ -123,26 +124,26 @@ static int post_checkout_event_changes(lua_State *state) {
   }
 
   if (git_commit_lookup(&commit_old, config->repo, &oid_old) != 0) {
-    ret = luaL_error(state, "failed to lookup git commit to oid: %s",
-                     checkout->prev);
+    err = "failed to lookup git commit to oid";
+    commit = checkout->prev;
     goto cleanup;
   }
 
   if (git_commit_lookup(&commit_new, config->repo, &oid_new) != 0) {
-    ret = luaL_error(state, "failed to lookup git commit to oid: %s",
-                     checkout->next);
+    err = "failed to lookup git commit to oid";
+    commit = checkout->next;
     goto cleanup;
   }
 
   if (git_commit_tree(&tree_old, commit_old) != 0) {
-    ret = luaL_error(state, "failed to resolve commit content %s",
-                     checkout->prev);
+    err = "failed to resolve commit content %s";
+    commit = checkout->prev;
     goto cleanup;
   }
 
   if (git_commit_tree(&tree_new, commit_new) != 0) {
-    ret = luaL_error(state, "failed to resolve commit content %s",
-                     checkout->next);
+    err = "failed to resolve commit content %s";
+    commit = checkout->prev;
     goto cleanup;
   }
 
@@ -155,15 +156,29 @@ static int post_checkout_event_changes(lua_State *state) {
 
   if (git_diff_tree_to_tree(&diff, config->repo, tree_old, tree_new, &opts) !=
       0) {
-    ret = luaL_error(state, "failed to calculate diff between %s and %s",
-                     checkout->prev, checkout->next);
+    err = "failed to calculate the difference between commits";
+    commit = checkout->next;
     goto cleanup;
   }
 
   auto test = git_diff_num_deltas(diff) > 0;
 
-  lua_pushboolean(state, test);
+  if (commit_old)
+    git_commit_free(commit_old);
 
+  if (commit_new)
+    git_commit_free(commit_new);
+
+  if (tree_old)
+    git_tree_free(tree_old);
+
+  if (tree_new)
+    git_tree_free(tree_new);
+
+  if (diff)
+    git_diff_free(diff);
+
+  lua_pushboolean(state, test);
   return 1;
 
 cleanup:
@@ -182,7 +197,7 @@ cleanup:
   if (diff)
     git_diff_free(diff);
 
-  return ret;
+  return luaL_error(state, "%s: %s", err, commit);
 }
 
 static const luaL_Reg post_checkout_event_funcs[] = {
