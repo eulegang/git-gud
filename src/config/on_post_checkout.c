@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/fcntl.h>
+#include <sys/syslimits.h>
 #include <unistd.h>
 
 static char PATH_SCRATCH[PATH_MAX];
@@ -22,8 +23,13 @@ static int post_checkout_event_exists(lua_State *state) {
 
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
-  strncpy(PATH_SCRATCH, git_repository_workdir(config->repo), PATH_MAX);
-  strncat(PATH_SCRATCH, path, PATH_MAX);
+  if (strlcpy(PATH_SCRATCH, git_repository_workdir(config->repo), PATH_MAX)) {
+    return luaL_error(state, "overflown path buffer");
+  }
+
+  if (strlcat(PATH_SCRATCH, path, PATH_MAX) >= PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
 
   trace("exists('%s')\n", PATH_SCRATCH);
   bool test = access(PATH_SCRATCH, F_OK) == 0;
@@ -44,8 +50,14 @@ static int post_checkout_event_root_has(lua_State *state) {
     return 1;
   }
 
-  strncpy(PATH_SCRATCH, git_repository_workdir(config->parent), PATH_MAX);
-  strncat(PATH_SCRATCH, path, PATH_MAX);
+  if (strlcpy(PATH_SCRATCH, git_repository_workdir(config->parent), PATH_MAX) >=
+      PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
+
+  if (strlcat(PATH_SCRATCH, path, PATH_MAX) >= PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
 
   trace("root_has('%s')\n", PATH_SCRATCH);
   bool test = access(PATH_SCRATCH, F_OK) == 0;
@@ -61,11 +73,21 @@ static int post_checkout_event_link(lua_State *state) {
 
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
-  strncpy(PATH_SCRATCH, git_repository_workdir(config->parent), PATH_MAX);
-  strncat(PATH_SCRATCH, path, PATH_MAX);
+  if (strlcpy(PATH_SCRATCH, git_repository_workdir(config->parent), PATH_MAX) >=
+      PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
+  if (strlcat(PATH_SCRATCH, path, PATH_MAX) >= PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
 
-  strncpy(PATH_TARGET_SCRATCH, git_repository_workdir(config->repo), PATH_MAX);
-  strncat(PATH_TARGET_SCRATCH, path, PATH_MAX);
+  if (strlcpy(PATH_TARGET_SCRATCH, git_repository_workdir(config->repo),
+              PATH_MAX) >= PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
+  if (strlcat(PATH_TARGET_SCRATCH, path, PATH_MAX) >= PATH_MAX) {
+    return luaL_error(state, "overflown path buffer");
+  }
 
   int res = link(PATH_SCRATCH, PATH_TARGET_SCRATCH);
 

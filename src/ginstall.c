@@ -17,8 +17,13 @@ static int link_script(const char *src, const char *name, install_opts opts) {
 
   char *path = dirname_r(src, BUF);
 
-  strncat(path, "/", PATH_MAX);
-  strncat(path, name, PATH_MAX);
+  if (strlcat(path, "/", PATH_MAX) >= PATH_MAX) {
+    return -1;
+  }
+
+  if (strlcat(path, name, PATH_MAX) >= PATH_MAX) {
+    return -1;
+  }
 
   int status = symlink(src, path);
 
@@ -66,8 +71,13 @@ int git_gud_install(install_opts opts) {
   }
 
   const char *path = git_repository_commondir(repo);
-  strncpy(EXEC_PATH, path, PATH_MAX);
-  strncat(EXEC_PATH, "hooks/git-gud", PATH_MAX);
+  if (strlcpy(EXEC_PATH, path, PATH_MAX) >= PATH_MAX) {
+    return -1;
+  }
+
+  if (strlcat(EXEC_PATH, "hooks/git-gud", PATH_MAX) >= PATH_MAX) {
+    return -1;
+  }
 
   if (!access(EXEC_PATH, X_OK) && !opts.force) {
     die("refusing to install over existing version (use --force to ignore)\n");
