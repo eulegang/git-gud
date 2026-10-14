@@ -215,5 +215,5 @@ void config_post_checkout(config_t *config, post_checkout_t checkout) {
     }
   }
 
-  lua_pop(config->state, -1);
+  lua_pop(config->state, 1);
 }
