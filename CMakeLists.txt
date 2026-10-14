@@ -48,6 +48,7 @@ target_compile_options(git-gud PRIVATE ${LUA_CFLAGS})
 include(GNUInstallDirs)
 install(TARGETS git-gud RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES man/git-gud.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+install(FILES lua/git-gud.lua DESTINATION ${CMAKE_INSTALL_DATADIR}/git-gud)
 
 include(CTest)
 
