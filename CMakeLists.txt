@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(git-gud
     VERSION 0.1.0
-    DESCRIPTION "A C project"
+		DESCRIPTION "A git hooks manager"
     LANGUAGES C
 )
 
