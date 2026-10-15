@@ -1,5 +1,4 @@
-#ifndef _CONFIG_INTERNAL_H
-#define _CONFIG_INTERNAL_H
+#pragma once
 
 #include <git2.h>
 #include <lauxlib.h>
@@ -20,5 +19,3 @@ struct config {
 
   struct lua_refs on_checkout;
 };
-
-#endif

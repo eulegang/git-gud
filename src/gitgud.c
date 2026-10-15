@@ -15,8 +15,8 @@
 char CWD[PATH_MAX];
 
 typedef enum {
-  GUD_CMD_VERSION,
-  GUD_CMD_INSTALL,
+  GUD_CMD_VERSION = 0,
+  GUD_CMD_INSTALL = 1,
 
   GUD_CMD_INVALID = -1,
   GUD_CMD_BLANK = -2,
@@ -62,6 +62,8 @@ int git_gud_main(int argc, char **argv) {
       switch (ch) {
       case 'f':
         opts.force = true;
+        break;
+      default:
         break;
       }
     }

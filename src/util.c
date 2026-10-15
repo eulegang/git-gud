@@ -15,7 +15,7 @@ void init_trace_log(const char *path) {
 
 void deinit_trace_log() {
   if (stdtrace && stdtrace != stderr) {
-    fclose(stdtrace);
+    (void)fclose(stdtrace);
   }
 }
 

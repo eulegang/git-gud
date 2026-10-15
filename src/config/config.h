@@ -1,5 +1,4 @@
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#pragma once
 
 #include "git2/types.h"
 #include <git2.h>
@@ -11,5 +10,3 @@ config_t *config_init(const char *path, git_repository *repo,
 void config_deinit(config_t *);
 
 #include "on_post_checkout.h"
-
-#endif

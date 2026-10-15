@@ -22,19 +22,19 @@ configure_file(
 )
 
 
-add_executable(git-gud
+set(GIT_GUD_SOURCES
     src/main.c
     src/detect.c
-		src/util.c
-		src/gitgud.c
-		src/gversion.c
-		src/ginstall.c
-
-		src/hooks/post-checkout.c
-
-		src/config/config.c
-		src/config/on_post_checkout.c
+    src/util.c
+    src/gitgud.c
+    src/gversion.c
+    src/ginstall.c
+    src/hooks/post-checkout.c
+    src/config/config.c
+    src/config/on_post_checkout.c
 )
+
+add_executable(git-gud ${GIT_GUD_SOURCES})
 
 target_include_directories(git-gud PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -44,6 +44,18 @@ target_link_libraries(git-gud PRIVATE ${GIT2_LDFLAGS})
 target_compile_options(git-gud PRIVATE ${GIT2_CFLAGS})
 target_link_libraries(git-gud PRIVATE ${LUA_LDFLAGS})
 target_compile_options(git-gud PRIVATE ${LUA_CFLAGS})
+
+find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy)
+if(CLANG_TIDY_EXECUTABLE)
+    add_custom_target(lint
+        COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} ${GIT_GUD_SOURCES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Running clang-tidy"
+        VERBATIM
+    )
+else()
+    message(STATUS "clang-tidy not found; lint target unavailable")
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS git-gud RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

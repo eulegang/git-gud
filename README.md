@@ -15,6 +15,15 @@ cmake --build build
 ./build/git_gud
 ```
 
+## Lint
+
+Install `clang-tidy`, then configure and run the optional lint target:
+
+```sh
+cmake -S . -B build
+cmake --build build --target lint
+```
+
 ## Test
 
 Tests are written with [Bats](https://bats-core.readthedocs.io/) and registered with CTest when `bats` is available on `PATH`.

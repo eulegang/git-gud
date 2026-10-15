@@ -40,6 +40,7 @@ static const luaL_Reg gud_funcs[] = {{"on_checkout", gud_on_checkout},
 
                                      {NULL, NULL}};
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 config_t *config_init(const char *path, git_repository *repo,
                       git_repository *parent) {
   config_t *config = malloc(sizeof(config_t));
@@ -60,6 +61,7 @@ config_t *config_init(const char *path, git_repository *repo,
     config->on_checkout.refs[i] = LUA_NOREF;
   }
 
+  // NOLINTNEXTLINE(bugprone-signed-bitwise)
   luaL_openlibs(config->state);
 
   lua_pushcfunction(config->state, lua_trace);

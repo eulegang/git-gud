@@ -1,5 +1,4 @@
-#ifndef __CONFIG_POST_CHECKOUT_H
-#define __CONFIG_POST_CHECKOUT_H
+#pragma once
 
 typedef struct config config_t;
 typedef enum { CheckoutFile, CheckoutBranch } checkout_t;
@@ -10,5 +9,3 @@ typedef struct {
 } post_checkout_t;
 
 void config_post_checkout(config_t *, post_checkout_t);
-
-#endif

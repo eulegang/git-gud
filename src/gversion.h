@@ -1,6 +1,3 @@
-#ifndef _G_VERSION_H
-#define _G_VERSION_H
+#pragma once
 
 int git_gud_version(void);
-
-#endif
