@@ -253,6 +253,10 @@ void config_post_checkout(config_t *config, post_checkout_t checkout) {
     if (lua_pcall(config->state, 1, 0, 0) != LUA_OK) {
       const char *msg = lua_tostring(config->state, -1);
       trace("failed to call on_checkout: %s\n", msg);
+
+      if (config->status & STATUS_FAIL) {
+        exit(16);
+      }
     }
   }
 

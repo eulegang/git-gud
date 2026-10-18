@@ -4,6 +4,7 @@
 
 #include "detect.h"
 #include "gitgud.h"
+#include "hooks/commit-msg.h"
 #include "hooks/post-checkout.h"
 #include "util.h"
 
@@ -42,6 +43,11 @@ int main(int argc, char **argv) {
     trace("using checkout driver\n");
     status = hook_post_checkout(argc, argv);
     break;
+  case CMD_COMMIT_MSG:
+    trace("using commit-msg driver\n");
+    status = hook_commit_msg(argc, argv);
+    break;
+
   case CMD_INVALID:
     die("failed to detect the type of script this is supposed to run\n");
     break;

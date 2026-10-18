@@ -12,7 +12,7 @@ cmake --build build
 ## Run
 
 ```sh
-./build/git_gud
+./build/git-gud
 ```
 
 ## Lint
@@ -26,10 +26,12 @@ cmake --build build --target lint
 
 ## Test
 
-Tests are written with [Bats](https://bats-core.readthedocs.io/) and registered with CTest when `bats` is available on `PATH`.
+C unit tests use [Munit](https://nemequ.github.io/munit/) (vendored under `third_party/munit`, MIT license). [Bats](https://bats-core.readthedocs.io/) integration tests are registered when `bats` is available on `PATH`. Both run through CTest.
 
 ```sh
 cmake -S . -B build
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
+
+Use `-DBUILD_TESTING=OFF` when configuring to skip the test targets.

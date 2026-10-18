@@ -18,5 +18,9 @@ cmd_t detect_cmd(int argc, char **argv) {
     return CMD_POST_CHECKOUT;
   }
 
+  if (strcmp(name, "commit-msg") == 0) {
+    return CMD_COMMIT_MSG;
+  }
+
   return CMD_INVALID;
 }

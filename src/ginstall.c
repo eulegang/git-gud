@@ -52,12 +52,14 @@ static int install_base(char *src, char *dst, install_opts opts) {
 
 enum FailedStage {
   FailedPostCheckout = 1,
-  FailedEnd,
+  FailedCommitMsg = 2,
+  FailedEnd = 3,
 };
 
 char *stages[] = {
     NULL,
     "post-checkout",
+    "commit-msg",
     NULL,
 };
 

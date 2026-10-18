@@ -29,9 +29,17 @@ set(GIT_GUD_SOURCES
     src/gitgud.c
     src/gversion.c
     src/ginstall.c
+		src/mbytes.c
+
     src/hooks/post-checkout.c
+    src/hooks/commit-msg.c
+
+    src/commit/commit.c
+
     src/config/config.c
+    src/config/internal.c
     src/config/on_post_checkout.c
+    src/config/on_commit.c
 )
 
 add_executable(git-gud ${GIT_GUD_SOURCES})
@@ -65,6 +73,19 @@ install(FILES lua/git-gud.lua DESTINATION ${CMAKE_INSTALL_DATADIR}/git-gud)
 include(CTest)
 
 if(BUILD_TESTING)
+    add_library(munit STATIC third_party/munit/munit.c)
+    target_include_directories(munit SYSTEM PUBLIC third_party/munit)
+
+    add_executable(git-gud-unit-tests tests/detect.c src/detect.c)
+    target_include_directories(git-gud-unit-tests PRIVATE src)
+    target_link_libraries(git-gud-unit-tests PRIVATE munit)
+    add_test(NAME unit.detect COMMAND git-gud-unit-tests)
+
+    add_executable(git-gud-commit-tests tests/commit.c src/commit/commit.c)
+    target_include_directories(git-gud-commit-tests PRIVATE src/commit)
+    target_link_libraries(git-gud-commit-tests PRIVATE munit)
+    add_test(NAME unit.commit COMMAND git-gud-commit-tests)
+
     find_program(BATS_EXECUTABLE NAMES bats bats-core)
 
     if(BATS_EXECUTABLE)

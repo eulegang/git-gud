@@ -14,15 +14,29 @@ static int gud_on_checkout(lua_State *state) {
   luaL_checktype(state, 1, LUA_TFUNCTION);
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
-  if (config->on_checkout.n >= REFS_MAX) {
+  lua_pushvalue(state, 1);
+  int new_ref = luaL_ref(state, LUA_REGISTRYINDEX);
+
+  if (!luaC_push_ref(&config->on_checkout, new_ref)) {
+    luaL_unref(state, LUA_REGISTRYINDEX, new_ref);
     return luaL_error(state, "to many on_checkout handlers registered");
   }
+
+  return 0;
+}
+
+static int gud_on_commit_msg(lua_State *state) {
+  trace("gud_on_commit_msg called\n");
+  luaL_checktype(state, 1, LUA_TFUNCTION);
+  auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
   lua_pushvalue(state, 1);
   int new_ref = luaL_ref(state, LUA_REGISTRYINDEX);
 
-  config->on_checkout.refs[config->on_checkout.n++] = new_ref;
-  trace("ref added\n");
+  if (!luaC_push_ref(&config->on_commit_msg, new_ref)) {
+    luaL_unref(state, LUA_REGISTRYINDEX, new_ref);
+    return luaL_error(state, "to many on_checkout handlers registered");
+  }
 
   return 0;
 }
@@ -36,8 +50,25 @@ static int lua_trace(lua_State *state) {
   return 0;
 }
 
-static const luaL_Reg gud_funcs[] = {{"on_checkout", gud_on_checkout},
+static int lua_fail(lua_State *state) {
+  auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
+  int argc = lua_gettop(state);
+
+  config->status |= STATUS_FAIL;
+
+  const char *msg = "failing custom script";
+
+  if (argc > 0) {
+    msg = lua_tostring(state, 1);
+    (void)fprintf(stderr, "%s\n", msg);
+  }
+
+  return luaL_error(state, "%s\n", msg);
+}
+
+static const luaL_Reg gud_funcs[] = {{"on_checkout", gud_on_checkout},
+                                     {"on_commit_msg", gud_on_commit_msg},
                                      {NULL, NULL}};
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -66,6 +97,10 @@ config_t *config_init(const char *path, git_repository *repo,
 
   lua_pushcfunction(config->state, lua_trace);
   lua_setglobal(config->state, "trace");
+
+  lua_pushlightuserdata(config->state, config);
+  lua_pushcclosure(config->state, lua_fail, 1);
+  lua_setglobal(config->state, "fail");
 
   lua_newtable(config->state);
   lua_pushlightuserdata(config->state, config);
