@@ -33,3 +33,7 @@ gud = {}
 ---Write a message to git-gud's trace output when tracing is enabled.
 ---@param message string
 function trace(message) end
+
+--- Print an error message and fail the hook
+---@param message? string the message to print
+function fail(message) end
