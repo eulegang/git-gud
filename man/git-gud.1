@@ -11,6 +11,7 @@
 .Op Ar directory
 .Nm
 .Cm version
+.Op Ar directory
 .Sh DESCRIPTION
 .Nm
 installs and runs git lua hooks for repository automation.
@@ -37,9 +38,10 @@ Refuses to overwrite an existing installation unless
 or
 .Fl -force
 is supplied.
-.It Cm version
-Print the command version and, when installed in the current repository, the hook
-version.
+.It Cm version Op Ar directory
+Print the command version and the version installed in the specified directory,
+if present.
+If no directory is specified, check the current repository's hooks directory.
 .El
 .Sh HOOKS
 The supported hooks are:

@@ -52,7 +52,10 @@ int git_gud_main(int argc, char **argv) {
 
   switch (cmd) {
   case GUD_CMD_VERSION:
-    status = git_gud_version();
+    if (argc > 3) {
+      die("version accepts at most one directory\n");
+    }
+    status = git_gud_version(argc == 3 ? argv[2] : NULL);
     break;
 
   case GUD_CMD_INSTALL:
