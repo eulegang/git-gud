@@ -56,7 +56,7 @@ int git_gud_main(int argc, char **argv) {
     break;
 
   case GUD_CMD_INSTALL:
-    install_opts opts = {.force = false, .src = argv[0]};
+    install_opts opts = {.force = false, .src = argv[0], .directory = NULL};
     while ((ch = getopt_long(argc - 1, argv + 1, "f", install_options, NULL)) !=
            -1) {
       switch (ch) {
@@ -64,8 +64,15 @@ int git_gud_main(int argc, char **argv) {
         opts.force = true;
         break;
       default:
-        break;
+        die("invalid install option\n");
       }
+    }
+
+    if (optind < argc - 1) {
+      opts.directory = argv[optind + 1];
+    }
+    if (optind < argc - 2) {
+      die("install accepts at most one directory\n");
     }
 
     status = git_gud_install(opts);

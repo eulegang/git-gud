@@ -8,6 +8,7 @@
 .Nm
 .Cm install
 .Op Fl f | Fl -force
+.Op Ar directory
 .Nm
 .Cm version
 .Sh DESCRIPTION
@@ -25,10 +26,12 @@ Set
 to use a different configuration file.
 .Sh COMMANDS
 .Bl -tag -width install
-.It Cm install Op Fl f | Fl -force
+.It Cm install Op Fl f | Fl -force Op Ar directory
 Install
 .Nm
-into the current repository's hooks directory and link supported hook names to it.
+into the specified hooks directory and link supported hook names to it.
+If no directory is specified, use the current repository's hooks directory.
+The specified directory must already exist; it does not need to belong to a Git repository.
 Refuses to overwrite an existing installation unless
 .Fl f
 or

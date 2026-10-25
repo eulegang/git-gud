@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <git2.h>
@@ -65,23 +66,26 @@ char *stages[] = {
 
 static char EXEC_PATH[PATH_MAX];
 int git_gud_install(install_opts opts) {
-  git_repository *repo;
+  git_repository *repo = NULL;
+  const char *directory = opts.directory;
 
-  int status = git_repository_open_ext(&repo, CWD, 0, NULL);
-  if (status == -1) {
-    auto err = git_error_last();
-
-    die("failed to open git repo: %s\n", err->message);
+  if (!directory) {
+    if (git_repository_open_ext(&repo, CWD, 0, NULL) == -1) {
+      auto err = git_error_last();
+      die("failed to open git repo: %s\n", err->message);
+    }
+    directory = git_repository_commondir(repo);
   }
 
-  const char *path = git_repository_commondir(repo);
-  if (strlcpy(EXEC_PATH, path, PATH_MAX) >= PATH_MAX) {
-    return -1;
+  if (!realpath(directory, EXEC_PATH)) {
+    die("failed to resolve install directory: %s\n", directory);
+  }
+  if (strlcat(EXEC_PATH, opts.directory ? "/git-gud" : "/hooks/git-gud",
+              PATH_MAX) >= PATH_MAX) {
+    die("install path is too long\n");
   }
 
-  if (strlcat(EXEC_PATH, "hooks/git-gud", PATH_MAX) >= PATH_MAX) {
-    return -1;
-  }
+  int status;
 
   if (!access(EXEC_PATH, X_OK) && !opts.force) {
     die("refusing to install over existing version (use --force to ignore)\n");
@@ -111,6 +115,8 @@ int git_gud_install(install_opts opts) {
     }
   }
 
-  git_repository_free(repo);
+  if (repo) {
+    git_repository_free(repo);
+  }
   return 0;
 }
