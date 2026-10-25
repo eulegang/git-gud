@@ -48,6 +48,8 @@ The supported hooks are:
 .Bl -tag -width post-checkout
 .It Cm post-checkout
 Runs after a checkout and invokes registered Lua checkout handlers.
+.It Cm commit-msg
+Runs before a commit is created and invokes registered Lua commit-message handlers, passing in the commit message info
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width GIT_GUD_TRACE_FILE
