@@ -9,11 +9,17 @@
 #include "hooks/post-checkout.h"
 #include "util.h"
 
+static const hook_t hooks[] = {
+    {"git-gud", git_gud_main},
+    {"post-checkout", hook_post_checkout},
+    {"commit-msg", hook_commit_msg},
+};
+
 int main(int argc, char **argv) {
   init_trace_syslog();
 
-  cmd_t cmd = detect_cmd(argc, argv);
-  int status = 0;
+  const hook_t *hook =
+      detect_hook(argc, argv, hooks, sizeof(hooks) / sizeof(hooks[0]));
 
   const char *cwd = getcwd(CWD, PATH_MAX);
   if (!cwd) {
@@ -21,24 +27,12 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  switch (cmd) {
-  case CMD_GIT_GUD:
-    gud_log(LOG_DEBUG, "using git gud driver");
-    status = git_gud_main(argc, argv);
-    break;
-  case CMD_POST_CHECKOUT:
-    gud_log(LOG_DEBUG, "using checkout driver");
-    status = hook_post_checkout(argc, argv);
-    break;
-  case CMD_COMMIT_MSG:
-    gud_log(LOG_DEBUG, "using commit-msg driver");
-    status = hook_commit_msg(argc, argv);
-    break;
-
-  case CMD_INVALID:
+  if (!hook) {
     die("failed to detect the type of script this is supposed to run\n");
-    break;
   }
+
+  gud_log(LOG_DEBUG, "using %s driver\n", hook->name);
+  int status = hook->run(argc, argv);
 
   deinit_trace_log();
 

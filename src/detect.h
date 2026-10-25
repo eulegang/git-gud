@@ -1,10 +1,11 @@
 #pragma once
 
-typedef enum {
-  CMD_GIT_GUD = 0,
-  CMD_POST_CHECKOUT = 1,
-  CMD_COMMIT_MSG = 2,
-  CMD_INVALID = -1,
-} cmd_t;
+#include <stddef.h>
 
-cmd_t detect_cmd(int argc, char **argv);
+typedef struct {
+  const char *name;
+  int (*run)(int argc, char **argv);
+} hook_t;
+
+const hook_t *detect_hook(int argc, char **argv, const hook_t *hooks,
+                          size_t hook_count);
