@@ -86,6 +86,11 @@ if(BUILD_TESTING)
     target_link_libraries(git-gud-commit-tests PRIVATE munit)
     add_test(NAME unit.commit COMMAND git-gud-commit-tests)
 
+    add_executable(git-gud-syslog-tests tests/syslog.c src/util.c)
+    target_include_directories(git-gud-syslog-tests PRIVATE src)
+    target_link_libraries(git-gud-syslog-tests PRIVATE munit)
+    add_test(NAME unit.syslog COMMAND git-gud-syslog-tests)
+
     find_program(BATS_EXECUTABLE NAMES bats bats-core)
 
     if(BATS_EXECUTABLE)

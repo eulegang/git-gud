@@ -59,9 +59,10 @@ Path to the Lua configuration file. Defaults to
 when it exists, otherwise
 .Pa ~/.config/git-gud/init.lua .
 .It Ev GIT_GUD_TRACE_SYSLOG
-Set syslog verbosity for
+Enable syslog logging for
 .Nm
-and its hooks.
+and its hooks, and set its verbosity.
+When unset, no syslog messages are sent.
 Set to
 .Cm DEBUG
 to include debug messages,
@@ -73,7 +74,6 @@ informational and more severe messages.
 Messages use the
 .Nm
 syslog identity.
-The current implementation may crash if this variable is unset.
 .El
 .Sh EXIT STATUS
 .Ex -std

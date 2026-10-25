@@ -3,25 +3,36 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/syslimits.h>
-#include <sys/syslog.h>
 #include <syslog.h>
 
 static bool tracing_syslog = false;
 
 void init_trace_syslog(void) {
-  openlog("git-gud", LOG_PID, LOG_USER);
-
   const char *env = getenv("GIT_GUD_TRACE_SYSLOG");
-
-  setlogmask(LOG_UPTO(LOG_INFO));
   if (env == NULL) {
-  } else if (strcmp(env, "DEBUG") == 0) {
+    return;
+  }
+
+  openlog("git-gud", LOG_PID, LOG_USER);
+  setlogmask(LOG_UPTO(LOG_INFO));
+  if (strcmp(env, "DEBUG") == 0) {
     setlogmask(LOG_UPTO(LOG_DEBUG));
   } else if (strcmp(env, "WARN") == 0 || strcmp(env, "WARNING") == 0) {
     setlogmask(LOG_UPTO(LOG_WARNING));
   }
 
   tracing_syslog = true;
+}
+
+void gud_log(int priority, const char *format, ...) {
+  if (!tracing_syslog) {
+    return;
+  }
+
+  va_list args;
+  va_start(args, format);
+  vsyslog(priority, format, args);
+  va_end(args);
 }
 
 void deinit_trace_log(void) {

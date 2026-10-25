@@ -24,6 +24,7 @@
   } while (0)
 
 void init_trace_syslog(void);
+void gud_log(int priority, const char *format, ...);
 void deinit_trace_log(void);
 
 const char *config_path();

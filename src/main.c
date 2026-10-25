@@ -23,15 +23,15 @@ int main(int argc, char **argv) {
 
   switch (cmd) {
   case CMD_GIT_GUD:
-    syslog(LOG_DEBUG, "using git gud driver");
+    gud_log(LOG_DEBUG, "using git gud driver");
     status = git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
-    syslog(LOG_DEBUG, "using checkout driver");
+    gud_log(LOG_DEBUG, "using checkout driver");
     status = hook_post_checkout(argc, argv);
     break;
   case CMD_COMMIT_MSG:
-    syslog(LOG_DEBUG, "using commit-msg driver");
+    gud_log(LOG_DEBUG, "using commit-msg driver");
     status = hook_commit_msg(argc, argv);
     break;
 
