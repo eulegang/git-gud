@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/fcntl.h>
 #include <sys/syslimits.h>
+#include <sys/syslog.h>
 #include <unistd.h>
 
 static char PATH_SCRATCH[PATH_MAX];
@@ -33,7 +34,7 @@ static int post_checkout_event_exists(lua_State *state) {
     return luaL_error(state, "overflown path buffer");
   }
 
-  trace("exists('%s')\n", PATH_SCRATCH);
+  syslog(LOG_DEBUG, "exists('%s')", PATH_SCRATCH);
   bool test = access(PATH_SCRATCH, F_OK) == 0;
 
   lua_pushboolean(state, test);
@@ -61,7 +62,7 @@ static int post_checkout_event_root_has(lua_State *state) {
     return luaL_error(state, "overflown path buffer");
   }
 
-  trace("root_has('%s')\n", PATH_SCRATCH);
+  syslog(LOG_DEBUG, "root_has('%s')", PATH_SCRATCH);
   bool test = access(PATH_SCRATCH, F_OK) == 0;
 
   lua_pushboolean(state, test);
@@ -252,7 +253,8 @@ void config_post_checkout(config_t *config, post_checkout_t checkout) {
 
     if (lua_pcall(config->state, 1, 0, 0) != LUA_OK) {
       const char *msg = lua_tostring(config->state, -1);
-      trace("failed to call on_checkout: %s\n", msg);
+      syslog(LOG_ERR, "failed to call on_checkout: %s", msg);
+      (void)fprintf(stderr, "failed to call on_checkout: %s\n", msg);
 
       if (config->status & STATUS_FAIL) {
         exit(16);

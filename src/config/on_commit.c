@@ -1,6 +1,7 @@
 #include "on_commit.h"
 #include "internal.h"
 #include <string.h>
+#include <sys/syslog.h>
 
 #include "../commit/commit.h"
 #include "../util.h"
@@ -48,7 +49,8 @@ void config_on_commit_msg(config_t *config, commit_msg_t commit_msg) {
 
     if (lua_pcall(config->state, 1, 0, 0) != LUA_OK) {
       const char *err = lua_tostring(config->state, -1);
-      trace("failed to call on_commit: %s\n", err);
+      syslog(LOG_ERR, "failed to call on_commit: %s", err);
+      (void)fprintf(stderr, "failed to call on_commit: %s\n", err);
 
       if (config->status & STATUS_FAIL) {
         exit(16);

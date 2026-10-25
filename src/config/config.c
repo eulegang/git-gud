@@ -8,9 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syslog.h>
 
 static int gud_on_checkout(lua_State *state) {
-  trace("gud_on_checkout called\n");
+  syslog(LOG_DEBUG, "gud_on_checkout called");
   luaL_checktype(state, 1, LUA_TFUNCTION);
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
@@ -26,7 +27,7 @@ static int gud_on_checkout(lua_State *state) {
 }
 
 static int gud_on_commit_msg(lua_State *state) {
-  trace("gud_on_commit_msg called\n");
+  syslog(LOG_DEBUG, "gud_on_commit_msg called");
   luaL_checktype(state, 1, LUA_TFUNCTION);
   auto config = (config_t *)lua_touserdata(state, lua_upvalueindex(1));
 
@@ -45,7 +46,7 @@ static int lua_trace(lua_State *state) {
   luaL_checktype(state, 1, LUA_TSTRING);
   const char *msg = lua_tostring(state, 1);
 
-  trace("%s\n", msg);
+  syslog(LOG_INFO, "%s", msg);
 
   return 0;
 }
@@ -110,7 +111,8 @@ config_t *config_init(const char *path, git_repository *repo,
   if (luaL_dofile(config->state, path) != LUA_OK) {
     const char *msg = lua_tostring(config->state, -1);
 
-    trace("failed to execute config [%s]: %s\n", path, msg);
+    syslog(LOG_ERR, "failed to execute config [%s]: %s", path, msg);
+    (void)fprintf(stderr, "failed to execute config [%s]: %s\n", path, msg);
 
     goto failed_eval;
   };

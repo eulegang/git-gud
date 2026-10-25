@@ -52,15 +52,28 @@ Runs after a checkout and invokes registered Lua checkout handlers.
 Runs before a commit is created and invokes registered Lua commit-message handlers, passing in the commit message info
 .El
 .Sh ENVIRONMENT
-.Bl -tag -width GIT_GUD_TRACE_FILE
+.Bl -tag -width GIT_GUD_TRACE_SYSLOG
 .It Ev GIT_GUD_INIT
 Path to the Lua configuration file. Defaults to
 .Pa ~/.config/git/gud.lua
 when it exists, otherwise
 .Pa ~/.config/git-gud/init.lua .
-.It Ev GIT_GUD_TRACE_FILE
-Enable tracing. If set to an empty value, trace output is written to standard
-error; otherwise trace output is written to the named file.
+.It Ev GIT_GUD_TRACE_SYSLOG
+Set syslog verbosity for
+.Nm
+and its hooks.
+Set to
+.Cm DEBUG
+to include debug messages,
+.Cm WARN
+or
+.Cm WARNING
+to include warnings and more severe messages, or any other value to include
+informational and more severe messages.
+Messages use the
+.Nm
+syslog identity.
+The current implementation may crash if this variable is unset.
 .El
 .Sh EXIT STATUS
 .Ex -std

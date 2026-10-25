@@ -1,22 +1,34 @@
 #include "util.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/syslimits.h>
+#include <sys/syslog.h>
+#include <syslog.h>
 
-FILE *stdtrace = NULL;
+static bool tracing_syslog = false;
 
-void init_trace_log(const char *path) {
-  if (path) {
-    stdtrace = fopen(path, "w");
-  } else {
-    stdtrace = stderr;
+void init_trace_syslog(void) {
+  openlog("git-gud", LOG_PID, LOG_USER);
+
+  const char *env = getenv("GIT_GUD_TRACE_SYSLOG");
+
+  setlogmask(LOG_UPTO(LOG_INFO));
+  if (env == NULL) {
+  } else if (strcmp(env, "DEBUG") == 0) {
+    setlogmask(LOG_UPTO(LOG_DEBUG));
+  } else if (strcmp(env, "WARN") == 0 || strcmp(env, "WARNING") == 0) {
+    setlogmask(LOG_UPTO(LOG_WARNING));
   }
+
+  tracing_syslog = true;
 }
 
-void deinit_trace_log() {
-  if (stdtrace && stdtrace != stderr) {
-    (void)fclose(stdtrace);
+void deinit_trace_log(void) {
+  if (tracing_syslog) {
+    closelog();
   }
+  tracing_syslog = false;
 }
 
 char CONFIG_PATH[PATH_MAX] = {0};

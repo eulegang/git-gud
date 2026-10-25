@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syslog.h>
 
 #include "detect.h"
 #include "gitgud.h"
@@ -9,21 +10,7 @@
 #include "util.h"
 
 int main(int argc, char **argv) {
-  const char *tracefile = getenv("GIT_GUD_TRACE_FILE");
-  if (tracefile) {
-    if (tracefile[0] == 0) {
-      init_trace_log(NULL);
-    } else {
-      init_trace_log(tracefile);
-    }
-  }
-
-  when_tracing {
-    trace("starting git-gud\n");
-    for (int i = 0; i < argc; i++) {
-      trace("  - %s\n", argv[i]);
-    }
-  }
+  init_trace_syslog();
 
   cmd_t cmd = detect_cmd(argc, argv);
   int status = 0;
@@ -36,15 +23,15 @@ int main(int argc, char **argv) {
 
   switch (cmd) {
   case CMD_GIT_GUD:
-    trace("using git gud driver\n");
+    syslog(LOG_DEBUG, "using git gud driver");
     status = git_gud_main(argc, argv);
     break;
   case CMD_POST_CHECKOUT:
-    trace("using checkout driver\n");
+    syslog(LOG_DEBUG, "using checkout driver");
     status = hook_post_checkout(argc, argv);
     break;
   case CMD_COMMIT_MSG:
-    trace("using commit-msg driver\n");
+    syslog(LOG_DEBUG, "using commit-msg driver");
     status = hook_commit_msg(argc, argv);
     break;
 
