@@ -24,7 +24,7 @@ configure_file(
 
 set(GIT_GUD_SOURCES
     src/main.c
-    src/detect.c
+    src/hooks/hooks.c
     src/util.c
     src/gitgud.c
     src/gversion.c
@@ -76,7 +76,7 @@ if(BUILD_TESTING)
     add_library(munit STATIC third_party/munit/munit.c)
     target_include_directories(munit SYSTEM PUBLIC third_party/munit)
 
-    add_executable(git-gud-unit-tests tests/detect.c src/detect.c)
+    add_executable(git-gud-unit-tests tests/detect.c src/hooks/hooks.c)
     target_include_directories(git-gud-unit-tests PRIVATE src)
     target_link_libraries(git-gud-unit-tests PRIVATE munit)
     add_test(NAME unit.detect COMMAND git-gud-unit-tests)

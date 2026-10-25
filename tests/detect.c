@@ -1,4 +1,7 @@
-#include "detect.h"
+#include "hooks/hooks.h"
+#include "hooks/commit-msg.h"
+#include "hooks/post-checkout.h"
+#include "gitgud.h"
 #include <munit.h>
 
 static int driver(int argc, char **argv) {
@@ -18,6 +21,11 @@ static int commit_msg(int argc, char **argv) {
   (void)argv;
   return 9;
 }
+
+// Stand-ins for the entry points registered by hooks.c.
+int git_gud_main(int argc, char **argv) { return driver(argc, argv); }
+int hook_post_checkout(int argc, char **argv) { return checkout(argc, argv); }
+int hook_commit_msg(int argc, char **argv) { return commit_msg(argc, argv); }
 
 static const hook_t hooks[] = {
     {"git-gud", driver},
@@ -61,6 +69,18 @@ static MunitResult test_commit_msg(const MunitParameter params[], void *data) {
   return MUNIT_OK;
 }
 
+static MunitResult test_registered(const MunitParameter params[], void *data) {
+  (void)params;
+  (void)data;
+  char path[] = ".git/hooks/post-checkout";
+  char *argv[] = {path};
+  const hook_t *hook = detect_registered_hook(1, argv);
+  munit_assert_not_null(hook);
+  munit_assert_string_equal(hook->name, "post-checkout");
+  munit_assert_int(hook->run(1, argv), ==, 8);
+  return MUNIT_OK;
+}
+
 static MunitResult test_unknown(const MunitParameter params[], void *data) {
   (void)params;
   (void)data;
@@ -81,6 +101,7 @@ static MunitTest tests[] = {
     {"/driver", test_driver, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
     {"/hook", test_hook, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
     {"/commit-msg", test_commit_msg, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {"/registered", test_registered, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
     {"/unknown", test_unknown, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
     {"/no-args", test_no_args, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
     {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},

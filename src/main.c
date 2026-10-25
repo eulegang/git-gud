@@ -3,23 +3,14 @@
 #include <string.h>
 #include <sys/syslog.h>
 
-#include "detect.h"
+#include "hooks/hooks.h"
 #include "gitgud.h"
-#include "hooks/commit-msg.h"
-#include "hooks/post-checkout.h"
 #include "util.h"
-
-static const hook_t hooks[] = {
-    {"git-gud", git_gud_main},
-    {"post-checkout", hook_post_checkout},
-    {"commit-msg", hook_commit_msg},
-};
 
 int main(int argc, char **argv) {
   init_trace_syslog();
 
-  const hook_t *hook =
-      detect_hook(argc, argv, hooks, sizeof(hooks) / sizeof(hooks[0]));
+  const hook_t *hook = detect_registered_hook(argc, argv);
 
   const char *cwd = getcwd(CWD, PATH_MAX);
   if (!cwd) {
