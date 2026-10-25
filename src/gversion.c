@@ -30,6 +30,10 @@ int git_gud_version(const char *directory) {
       die("failed to open git repo: %s\n", err->message);
     }
 
+    if (!repo) {
+      return 0;
+    }
+
     const char *path = git_repository_commondir(repo);
     if (strlcpy(EXEC_PATH, path, PATH_MAX) >= PATH_MAX) {
       die("failed to find the hooked version\n");
@@ -37,19 +41,21 @@ int git_gud_version(const char *directory) {
     git_repository_free(repo);
   }
 
-  if (strlcat(EXEC_PATH, directory ? "/git-gud" : "/hooks/git-gud",
-              PATH_MAX) >= PATH_MAX) {
-    die("failed to find the hooked version\n");
-  }
+  if (directory) {
+    if (strlcat(EXEC_PATH, directory ? "/git-gud" : "/hooks/git-gud",
+                PATH_MAX) >= PATH_MAX) {
+      die("failed to find the hooked version\n");
+    }
 
-  if (!access(EXEC_PATH, X_OK)) {
-    char *env[] = {
-        "GIT_GUD_HOOK_VERSION=1",
-        0,
-    };
+    if (!access(EXEC_PATH, X_OK)) {
+      char *env[] = {
+          "GIT_GUD_HOOK_VERSION=1",
+          0,
+      };
 
-    execle(EXEC_PATH, EXEC_PATH, "version", 0, env);
-    die("failed to exec the hooked version\n");
+      execle(EXEC_PATH, EXEC_PATH, "version", 0, env);
+      die("failed to exec the hooked version\n");
+    }
   }
 
   printf("hook: -\n");
