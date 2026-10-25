@@ -11,12 +11,14 @@
 
 #include "ginstall.h"
 #include "gversion.h"
+#include "hooks/hooks.h"
 
 char CWD[PATH_MAX];
 
 typedef enum {
   GUD_CMD_VERSION = 0,
   GUD_CMD_INSTALL = 1,
+  GUD_CMD_RUN = 2,
 
   GUD_CMD_INVALID = -1,
   GUD_CMD_BLANK = -2,
@@ -35,6 +37,10 @@ static gud_cmd_t detect_gud_cmd(int argc, char **argv) {
 
   if (strcmp(cmd, "install") == 0) {
     return GUD_CMD_INSTALL;
+  }
+
+  if (strcmp(cmd, "run") == 0) {
+    return GUD_CMD_RUN;
   }
 
   return GUD_CMD_INVALID;
@@ -80,6 +86,22 @@ int git_gud_main(int argc, char **argv) {
 
     status = git_gud_install(opts);
     break;
+
+  case GUD_CMD_RUN: {
+    if (argc < 3) {
+      die("run requires a hook name\n");
+    }
+
+    // Only hook drivers may be run; the git-gud driver is a command, not a hook.
+    if (strcmp(argv[2], "post-checkout") != 0 &&
+        strcmp(argv[2], "commit-msg") != 0) {
+      die("unsupported hook '%s'\n", argv[2]);
+    }
+
+    const hook_t *hook = detect_registered_hook(argc - 2, argv + 2);
+    status = hook->run(argc - 2, argv + 2);
+    break;
+  }
 
   case GUD_CMD_INVALID:
     die("invalid command issues '%s'\n", argv[1]);

@@ -15,6 +15,13 @@ cmake --build build
 ./build/git-gud
 ```
 
+To run a supported hook directly (without installing it), pass the arguments Git would pass to the hook:
+
+```sh
+./build/git-gud run commit-msg path/to/commit-message
+./build/git-gud run post-checkout <previous-ref> <new-ref> <0-or-1>
+```
+
 ## Lint
 
 Install `clang-tidy`, then configure and run the optional lint target:

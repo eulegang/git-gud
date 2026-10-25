@@ -12,6 +12,10 @@
 .Nm
 .Cm version
 .Op Ar directory
+.Nm
+.Cm run
+.Ar hook
+.Op Ar hook-arguments ...
 .Sh DESCRIPTION
 .Nm
 installs and runs git lua hooks for repository automation.
@@ -42,6 +46,13 @@ is supplied.
 Print the command version and the version installed in the specified directory,
 if present.
 If no directory is specified, check the current repository's hooks directory.
+.It Cm run Ar hook Op Ar hook-arguments ...
+Run a supported hook directly in the current repository, without installing it.
+Pass the same arguments Git would pass to that hook:
+.Cm commit-msg
+requires a commit message file path;
+.Cm post-checkout
+requires the previous ref, new ref, and checkout flag (0 for a file checkout, 1 for a branch checkout).
 .El
 .Sh HOOKS
 The supported hooks are:
